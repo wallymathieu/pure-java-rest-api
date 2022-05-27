@@ -1,16 +1,13 @@
 package com.consulner.app.api;
 
-import java.io.InputStream;
-
 import com.consulner.app.errors.ApplicationExceptions;
 import com.consulner.app.errors.ExceptionHandler;
-import com.consulner.app.errors.GlobalExceptionHandler;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-
 import com.sun.net.httpserver.HttpHandler;
 import io.vavr.control.Try;
+
+import java.io.InputStream;
 
 public abstract class Handler implements HttpHandler {
 

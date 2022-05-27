@@ -2,7 +2,7 @@ package com.consulner.app.api;
 
 import com.sun.net.httpserver.Headers;
 
-public class ResponseEntity<T> extends ResponseEntityBase {
+public class ResponseEntity<T> extends Response {
 
     private final T body;
 

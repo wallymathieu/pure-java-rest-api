@@ -2,12 +2,12 @@ package com.consulner.app.api;
 
 import com.sun.net.httpserver.Headers;
 
-public abstract class ResponseEntityBase {
+public abstract class Response {
 
     private final Headers headers;
     private final StatusCode statusCode;
 
-    public ResponseEntityBase(Headers pHeaders, StatusCode pStatusCode) {
+    public Response(Headers pHeaders, StatusCode pStatusCode) {
         headers = pHeaders;
         statusCode = pStatusCode;
     }

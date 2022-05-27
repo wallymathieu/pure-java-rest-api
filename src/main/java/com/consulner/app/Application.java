@@ -34,8 +34,10 @@ public class Application {
         this.errorHandler = errorHandler;
     }
     public void register(HttpServer server){
-        Handler registerHandler = new PostHandler<>(objectMapper, errorHandler,
-                RegistrationRequest.class,
+        HandlerBuilder builder = new HandlerBuilder(objectMapper,errorHandler)
+                .setDefaultContentType(Constants.APPLICATION_JSON);
+
+        server.createContext("/api/users/register", builder.post().okBodyContent(
                 (request)->{
                     NewUser user = NewUser.builder()
                             .login(request.getLogin())
@@ -44,15 +46,9 @@ public class Application {
 
                     String userId = userService.create(user);
 
-                    RegistrationResponse response = new RegistrationResponse(userId);
-                    return response;
-                },
-                Constants.APPLICATION_JSON, StatusCode.OK);
-        Handler listHandler = new GetHandler<>(objectMapper, errorHandler,
-                ()->userService.all(),
-                Constants.APPLICATION_JSON, StatusCode.OK);
-        server.createContext("/api/users/register", registerHandler);
-        server.createContext("/api/users", listHandler);
+                    return new RegistrationResponse(userId);
+                }, RegistrationRequest.class));
+        server.createContext("/api/users", builder.get().okSupplier(()-> userService.all()));
         HttpContext context =server.createContext("/api/hello", (exchange -> {
 
             if ("GET".equals(exchange.getRequestMethod())) {
