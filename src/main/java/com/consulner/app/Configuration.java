@@ -10,7 +10,7 @@ import com.consulner.domain.user.UserService;
 import java.io.IOException;
 import java.io.InputStream;
 
-class Configuration {
+public class Configuration {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(){
         com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -25,23 +25,23 @@ class Configuration {
         }
 
     };
-    private static final UserRepository USER_REPOSITORY = new InMemoryUserRepository();
-    private static final UserService USER_SERVICE = new UserService(USER_REPOSITORY);
-    private static final ExceptionHandler GLOBAL_ERROR_HANDLER = new GlobalExceptionHandler(OBJECT_MAPPER);
+    private final UserRepository USER_REPOSITORY = new InMemoryUserRepository();
+    private final UserService USER_SERVICE = new UserService(USER_REPOSITORY);
+    private final ExceptionHandler GLOBAL_ERROR_HANDLER = new GlobalExceptionHandler(OBJECT_MAPPER);
 
-    static ObjectMapper getObjectMapper() {
+    public ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
     }
 
-    static UserService getUserService() {
+    public UserService getUserService() {
         return USER_SERVICE;
     }
 
-    static UserRepository getUserRepository() {
+    UserRepository getUserRepository() {
         return USER_REPOSITORY;
     }
 
-    public static ExceptionHandler getErrorHandler() {
+    public ExceptionHandler getErrorHandler() {
         return GLOBAL_ERROR_HANDLER;
     }
 }

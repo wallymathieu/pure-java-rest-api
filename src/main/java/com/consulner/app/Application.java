@@ -1,31 +1,39 @@
 package com.consulner.app;
 
-import static com.consulner.app.Configuration.getErrorHandler;
-import static com.consulner.app.Configuration.getObjectMapper;
-import static com.consulner.app.Configuration.getUserService;
 import static com.consulner.app.api.ApiUtils.splitQuery;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.consulner.app.api.ObjectMapper;
 import com.consulner.app.api.user.RegistrationHandler;
+import com.consulner.app.errors.ExceptionHandler;
+import com.consulner.domain.user.UserService;
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
-class Application {
+public class Application {
+    private final RegistrationHandler registrationHandler;
+    private final UserService userService;
+    private final ObjectMapper objectMapper;
+    private final ExceptionHandler errorHandler;
 
-    public static void main(String[] args) throws IOException {
-        int serverPort = 8000;
-        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
+    public Application(UserService userService, ObjectMapper objectMapper, ExceptionHandler errorHandler){
+        this.userService = userService;
+        this.objectMapper = objectMapper;
 
-        RegistrationHandler registrationHandler = new RegistrationHandler(getUserService(), getObjectMapper(),
-            getErrorHandler());
+        this.errorHandler = errorHandler;
+        this.registrationHandler = new RegistrationHandler(userService, objectMapper,
+                errorHandler);
+    }
+    public void register(HttpServer server){
+
         server.createContext("/api/users/register", registrationHandler::handle);
 
         HttpContext context =server.createContext("/api/hello", (exchange -> {
@@ -51,6 +59,13 @@ class Application {
             }
         });
 
+    }
+    public static void main(String[] args) throws IOException {
+        int serverPort = 8000;
+        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), serverPort), 0);
+        Configuration c = new Configuration();
+        new Application(c.getUserService(), c.getObjectMapper(), c.getErrorHandler())
+                .register(server);
         server.setExecutor(null); // creates a default executor
         server.start();
     }

@@ -27,14 +27,14 @@ public class GlobalExceptionHandler implements ExceptionHandler {
             ErrorResponse response = getErrorResponse(throwable);
             exchange.sendResponseHeaders(response.getCode(), 0);
             OutputStream responseBody = exchange.getResponseBody();
-            responseBody.write(objectMapper.writeValueAsBytes(response));
+            responseBody.write(objectMapper.writeValueAsBytes(response.getMessage()));
             responseBody.close();
         } catch (Exception e) {
             mLog.log(Level.SEVERE,"Failed to write exception to response", e);
         }
     }
 
-    private ErrorResponse getErrorResponse(Throwable throwable) {
+    public ErrorResponse getErrorResponse(Throwable throwable) {
         ErrorResponseBuilder responseBuilder = ErrorResponse.builder();
         if (throwable instanceof ApplicationException) {
             ApplicationException exc = (ApplicationException) throwable;
