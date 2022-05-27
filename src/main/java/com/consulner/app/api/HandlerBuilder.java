@@ -39,43 +39,45 @@ public class HandlerBuilder {
     }
 
     public class PostHandlerBuilder {
-        public <RequestBody, ResponseBody> PostHandler<RequestBody, ResponseBody> okBody(
+        public <RequestBody, ResponseBody> BodyRequestHandler<RequestBody, ResponseBody> okBody(
                 Function<RequestEntity<RequestBody>, ResponseEntity<ResponseBody>> function, Class<RequestBody> requestBodyClass){
-            return new PostHandler<>(objectMapper,exceptionHandler, requestBodyClass, function);
+            return new BodyRequestHandler<>(objectMapper,exceptionHandler, requestBodyClass, function, "POST");
         }
-        public <RequestBody, ResponseBody> PostHandler<RequestBody, ResponseBody> okBodyContent(
+        public <RequestBody, ResponseBody> BodyRequestHandler<RequestBody, ResponseBody> okBodyContent(
                 Function<RequestBody, ResponseBody> function, Class<RequestBody> requestBodyClass){
             return okBody((r)->new ResponseEntity<>(function.apply(r.getRequestBody()),
                                 getHeaders(Constants.CONTENT_TYPE, defaultContentType), StatusCode.OK), requestBodyClass);
         }
     }
     public class GetHandlerBuilder {
-        public <ResponseBody> GetHandler<ResponseBody> ok(
+        public <ResponseBody> EmptyRequestBodyHandler<ResponseBody> ok(
                 Function<Request, ResponseEntity<ResponseBody>> function){
-            return new GetHandler<>(objectMapper, exceptionHandler, function);
+            return new EmptyRequestBodyHandler<>(objectMapper, exceptionHandler, function,"GET");
         }
-        public <ResponseBody> GetHandler<ResponseBody> okSupplier(
+        public <ResponseBody> EmptyRequestBodyHandler<ResponseBody> okSupplier(
                 Supplier<ResponseBody> function){
             return ok((r)-> new ResponseEntity<>(function.get(),
                     getHeaders(Constants.CONTENT_TYPE, defaultContentType), StatusCode.OK));
         }
     }
-    private static class PostHandler<RequestBody, ResponseBody> extends Handler {
+    private static class BodyRequestHandler<RequestBody, ResponseBody> extends Handler {
 
         private final Class<RequestBody> requestBodyClass;
         private final Function<RequestEntity<RequestBody>, ResponseEntity<ResponseBody>> function;
+        private final String method;
 
-        public PostHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler, Class<RequestBody> requestBodyClass,
-                           Function<RequestEntity<RequestBody>, ResponseEntity<ResponseBody>> function) {
+        public BodyRequestHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler, Class<RequestBody> requestBodyClass,
+                                  Function<RequestEntity<RequestBody>, ResponseEntity<ResponseBody>> function, String method) {
             super(objectMapper, exceptionHandler);
             this.requestBodyClass = requestBodyClass;
             this.function = function;
+            this.method = method;
         }
 
         @Override
         protected void execute(HttpExchange exchange) throws IOException {
             byte[] response;
-            if ("POST".equals(exchange.getRequestMethod())) {
+            if (method.equals(exchange.getRequestMethod())) {
                 ResponseEntity<ResponseBody> e = function.apply(
                         new RequestEntity<>(readRequest(exchange.getRequestBody(), requestBodyClass),
                             splitQuery(exchange.getRequestURI().getRawQuery())));
@@ -95,19 +97,21 @@ public class HandlerBuilder {
 
     }
 
-    static class GetHandler<ResponseBody> extends Handler {
+    private static class EmptyRequestBodyHandler<ResponseBody> extends Handler {
         private final Function<Request,ResponseEntity<ResponseBody>> function;
+        private final String method;
 
-        public GetHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler,
-                          Function<Request,ResponseEntity<ResponseBody>> function) {
+        public EmptyRequestBodyHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler,
+                                       Function<Request,ResponseEntity<ResponseBody>> function, String method) {
             super(objectMapper, exceptionHandler);
             this.function = function;
+            this.method = method;
         }
 
         @Override
         protected void execute(HttpExchange exchange) throws IOException {
             byte[] response;
-            if ("GET".equals(exchange.getRequestMethod())) {
+            if (method.equals(exchange.getRequestMethod())) {
                 ResponseEntity<ResponseBody> e = function.apply(new EmptyRequest(splitQuery(exchange.getRequestURI().getRawQuery())));
 
                 exchange.getResponseHeaders().putAll(e.getHeaders());
