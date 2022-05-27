@@ -8,6 +8,8 @@ import static com.consulner.app.api.ApiUtils.splitQuery;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +33,7 @@ class Application {
             if ("GET".equals(exchange.getRequestMethod())) {
                 Map<String, List<String>> params = splitQuery(exchange.getRequestURI().getRawQuery());
                 String noNameText = "Anonymous";
-                String name = params.getOrDefault("name", List.of(noNameText)).stream().findFirst().orElse(noNameText);
+                String name = params.getOrDefault("name", Collections.singletonList(noNameText)).stream().findFirst().orElse(noNameText);
                 String respText = String.format("Hello %s!", name);
                 exchange.sendResponseHeaders(200, respText.getBytes().length);
                 OutputStream output = exchange.getResponseBody();

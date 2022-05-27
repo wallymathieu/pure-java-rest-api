@@ -1,9 +1,14 @@
 package com.consulner.app.api.user;
 
-import lombok.Value;
-
-@Value
 class RegistrationResponse {
 
-    String id;
+    private final String id;
+
+    RegistrationResponse(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
 }

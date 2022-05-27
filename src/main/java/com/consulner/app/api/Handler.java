@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import com.consulner.app.errors.ApplicationExceptions;
 import com.consulner.app.errors.GlobalExceptionHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 

@@ -6,13 +6,13 @@ import java.io.OutputStream;
 
 import com.consulner.app.api.Constants;
 import com.consulner.app.api.Handler;
+import com.consulner.app.api.ObjectMapper;
 import com.consulner.app.api.ResponseEntity;
 import com.consulner.app.api.StatusCode;
 import com.consulner.app.errors.ApplicationExceptions;
 import com.consulner.app.errors.GlobalExceptionHandler;
 import com.consulner.domain.user.NewUser;
 import com.consulner.domain.user.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
 public class RegistrationHandler extends Handler {

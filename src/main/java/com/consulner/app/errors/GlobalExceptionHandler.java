@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import com.consulner.app.api.Constants;
 import com.consulner.app.api.ErrorResponse;
 import com.consulner.app.api.ErrorResponse.ErrorResponseBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.consulner.app.api.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
 public class GlobalExceptionHandler {

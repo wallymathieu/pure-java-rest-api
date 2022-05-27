@@ -2,12 +2,17 @@ package com.consulner.app.api;
 
 import com.sun.net.httpserver.Headers;
 
-import lombok.Value;
-
-@Value
-public class ResponseEntity<T> {
+public class ResponseEntity<T> extends ResponseEntityBase {
 
     private final T body;
-    private final Headers headers;
-    private final StatusCode statusCode;
+
+    public ResponseEntity(T pBody, Headers pHeaders, StatusCode pStatusCode) {
+        super(pHeaders,pStatusCode);
+        body = pBody;
+    }
+
+    public T getBody() {
+        return body;
+    }
+
 }
