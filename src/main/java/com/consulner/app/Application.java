@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.consulner.app.api.*;
-//import com.consulner.app.api.StatusCode;
 import com.consulner.app.api.user.PasswordEncoder;
 import com.consulner.app.api.user.RegistrationRequest;
 import com.consulner.app.api.user.RegistrationResponse;

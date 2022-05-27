@@ -15,7 +15,7 @@ import java.util.List;
 public class Configuration {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(){
-        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
         @Override
         public byte[] writeValueAsBytes(Object pO) throws IOException {
             return objectMapper.writeValueAsBytes(pO);
