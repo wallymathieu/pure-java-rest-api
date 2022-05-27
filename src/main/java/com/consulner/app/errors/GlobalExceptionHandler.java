@@ -2,6 +2,8 @@ package com.consulner.app.errors;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.consulner.app.api.Constants;
 import com.consulner.app.api.ErrorResponse;
@@ -9,44 +11,36 @@ import com.consulner.app.api.ErrorResponse.ErrorResponseBuilder;
 import com.consulner.app.api.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
-public class GlobalExceptionHandler {
-
+public class GlobalExceptionHandler implements ExceptionHandler {
+    private static final Logger mLog = Logger.getLogger(GlobalExceptionHandler.class.getName());
     private final ObjectMapper objectMapper;
 
     public GlobalExceptionHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public void handle(Throwable throwable, HttpExchange exchange) {
         try {
             throwable.printStackTrace();
             exchange.getResponseHeaders().set(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON);
-            ErrorResponse response = getErrorResponse(throwable, exchange);
+            ErrorResponse response = getErrorResponse(throwable);
+            exchange.sendResponseHeaders(response.getCode(), 0);
             OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(objectMapper.writeValueAsBytes(response));
             responseBody.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            mLog.log(Level.SEVERE,"Failed to write exception to response", e);
         }
     }
 
-    private ErrorResponse getErrorResponse(Throwable throwable, HttpExchange exchange) throws IOException {
+    private ErrorResponse getErrorResponse(Throwable throwable) {
         ErrorResponseBuilder responseBuilder = ErrorResponse.builder();
-        if (throwable instanceof InvalidRequestException) {
-            InvalidRequestException exc = (InvalidRequestException) throwable;
+        if (throwable instanceof ApplicationException) {
+            ApplicationException exc = (ApplicationException) throwable;
             responseBuilder.message(exc.getMessage()).code(exc.getCode());
-            exchange.sendResponseHeaders(400, 0);
-        } else if (throwable instanceof ResourceNotFoundException) {
-            ResourceNotFoundException exc = (ResourceNotFoundException) throwable;
-            responseBuilder.message(exc.getMessage()).code(exc.getCode());
-            exchange.sendResponseHeaders(404, 0);
-        } else if (throwable instanceof MethodNotAllowedException) {
-            MethodNotAllowedException exc = (MethodNotAllowedException) throwable;
-            responseBuilder.message(exc.getMessage()).code(exc.getCode());
-            exchange.sendResponseHeaders(405, 0);
         } else {
-            responseBuilder.code(500).message(throwable.getMessage());
-            exchange.sendResponseHeaders(500, 0);
+            responseBuilder.message(throwable.getMessage()).code(500);
         }
         return responseBuilder.build();
     }

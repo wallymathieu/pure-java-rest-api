@@ -3,6 +3,7 @@ package com.consulner.app.api;
 import java.io.InputStream;
 
 import com.consulner.app.errors.ApplicationExceptions;
+import com.consulner.app.errors.ExceptionHandler;
 import com.consulner.app.errors.GlobalExceptionHandler;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
@@ -13,10 +14,10 @@ import io.vavr.control.Try;
 public abstract class Handler {
 
     private final ObjectMapper objectMapper;
-    private final GlobalExceptionHandler exceptionHandler;
+    private final ExceptionHandler exceptionHandler;
 
     public Handler(ObjectMapper objectMapper,
-                   GlobalExceptionHandler exceptionHandler) {
+                   ExceptionHandler exceptionHandler) {
         this.objectMapper = objectMapper;
         this.exceptionHandler = exceptionHandler;
     }

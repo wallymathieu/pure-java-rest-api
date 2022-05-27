@@ -1,6 +1,7 @@
 package com.consulner.app;
 
 import com.consulner.app.api.ObjectMapper;
+import com.consulner.app.errors.ExceptionHandler;
 import com.consulner.app.errors.GlobalExceptionHandler;
 import com.consulner.data.user.InMemoryUserRepository;
 import com.consulner.domain.user.UserRepository;
@@ -26,7 +27,7 @@ class Configuration {
     };
     private static final UserRepository USER_REPOSITORY = new InMemoryUserRepository();
     private static final UserService USER_SERVICE = new UserService(USER_REPOSITORY);
-    private static final GlobalExceptionHandler GLOBAL_ERROR_HANDLER = new GlobalExceptionHandler(OBJECT_MAPPER);
+    private static final ExceptionHandler GLOBAL_ERROR_HANDLER = new GlobalExceptionHandler(OBJECT_MAPPER);
 
     static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
@@ -40,7 +41,7 @@ class Configuration {
         return USER_REPOSITORY;
     }
 
-    public static GlobalExceptionHandler getErrorHandler() {
+    public static ExceptionHandler getErrorHandler() {
         return GLOBAL_ERROR_HANDLER;
     }
 }
