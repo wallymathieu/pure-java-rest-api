@@ -10,32 +10,49 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.consulner.app.api.ObjectMapper;
-import com.consulner.app.api.user.RegistrationHandler;
+import com.consulner.app.api.*;
+//import com.consulner.app.api.StatusCode;
+import com.consulner.app.api.user.PasswordEncoder;
+import com.consulner.app.api.user.RegistrationRequest;
+import com.consulner.app.api.user.RegistrationResponse;
 import com.consulner.app.errors.ExceptionHandler;
-import com.consulner.domain.user.UserService;
+import com.consulner.domain.user.NewUser;
+import com.consulner.domain.user.UserRepository;
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
 public class Application {
-    private final RegistrationHandler registrationHandler;
-    private final UserService userService;
+    private final UserRepository userService;
     private final ObjectMapper objectMapper;
     private final ExceptionHandler errorHandler;
 
-    public Application(UserService userService, ObjectMapper objectMapper, ExceptionHandler errorHandler){
+    public Application(UserRepository userService, ObjectMapper objectMapper, ExceptionHandler errorHandler){
         this.userService = userService;
         this.objectMapper = objectMapper;
 
         this.errorHandler = errorHandler;
-        this.registrationHandler = new RegistrationHandler(userService, objectMapper,
-                errorHandler);
     }
     public void register(HttpServer server){
+        Handler registerHandler = new PostHandler<>(objectMapper, errorHandler,
+                RegistrationRequest.class,
+                (request)->{
+                    NewUser user = NewUser.builder()
+                            .login(request.getLogin())
+                            .password(PasswordEncoder.encode(request.getPassword()))
+                            .build();
 
-        server.createContext("/api/users/register", registrationHandler::handle);
+                    String userId = userService.create(user);
 
+                    RegistrationResponse response = new RegistrationResponse(userId);
+                    return response;
+                },
+                Constants.APPLICATION_JSON, StatusCode.OK);
+        Handler listHandler = new GetHandler<>(objectMapper, errorHandler,
+                ()->userService.all(),
+                Constants.APPLICATION_JSON, StatusCode.OK);
+        server.createContext("/api/users/register", registerHandler);
+        server.createContext("/api/users", listHandler);
         HttpContext context =server.createContext("/api/hello", (exchange -> {
 
             if ("GET".equals(exchange.getRequestMethod())) {
@@ -64,7 +81,7 @@ public class Application {
         int serverPort = 8000;
         HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), serverPort), 0);
         Configuration c = new Configuration();
-        new Application(c.getUserService(), c.getObjectMapper(), c.getErrorHandler())
+        new Application(c.getUserRepository(), c.getObjectMapper(), c.getErrorHandler())
                 .register(server);
         server.setExecutor(null); // creates a default executor
         server.start();

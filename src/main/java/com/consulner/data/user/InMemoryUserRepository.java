@@ -6,11 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.consulner.domain.user.NewUser;
 import com.consulner.domain.user.User;
+import com.consulner.domain.user.UserInfo;
 import com.consulner.domain.user.UserRepository;
 
 public class InMemoryUserRepository implements UserRepository {
 
-    private static final Map USERS_STORE = new ConcurrentHashMap();
+    private static final Map<String,User> USERS_STORE = new ConcurrentHashMap<>();
 
     @Override
     public String create(NewUser newUser) {
@@ -23,5 +24,12 @@ public class InMemoryUserRepository implements UserRepository {
         USERS_STORE.put(newUser.getLogin(), user);
 
         return id;
+    }
+
+    @Override
+    public UserInfo[] all() {
+        return USERS_STORE.values().stream()
+                .map(u->new UserInfo(u.getId(),u.getLogin()))
+                .toArray(UserInfo[]::new);
     }
 }

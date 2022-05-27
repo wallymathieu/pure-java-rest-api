@@ -6,28 +6,26 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class PostHandler<RequestBody, ResponseBody> extends Handler {
-
-    private Class<RequestBody> requestBodyClass;
-    private final Function<RequestBody, ResponseBody> function;
+public class GetHandler<ResponseBody> extends Handler {
+    private final Supplier<ResponseBody> function;
     private String contentType;
     private StatusCode statusCode;
 
-    public PostHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler, Class<RequestBody> requestBodyClass,
-                       Function<RequestBody,ResponseBody> function, String contentType, StatusCode statusCode) {
+    public GetHandler(ObjectMapper objectMapper, ExceptionHandler exceptionHandler,
+                      Supplier<ResponseBody> function, String contentType, StatusCode statusCode) {
         super(objectMapper, exceptionHandler);
-        this.requestBodyClass = requestBodyClass;
         this.function = function;
         this.contentType = contentType;
         this.statusCode = statusCode;
     }
+
     @Override
     protected void execute(HttpExchange exchange) throws IOException {
         byte[] response;
-        if ("POST".equals(exchange.getRequestMethod())) {
-            ResponseBody responseValue = function.apply(readRequest(exchange.getRequestBody(), requestBodyClass));
+        if ("GET".equals(exchange.getRequestMethod())) {
+            ResponseBody responseValue = function.get();
             ResponseEntity<ResponseBody> e = new ResponseEntity<>(responseValue,
                     getHeaders(Constants.CONTENT_TYPE, contentType), statusCode);
 

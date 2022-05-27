@@ -1,10 +1,10 @@
 package com.consulner.app.api.user;
 
-class RegistrationResponse {
+public class RegistrationResponse {
 
     private final String id;
 
-    RegistrationResponse(String id) {
+    public RegistrationResponse(String id) {
         this.id = id;
     }
 

@@ -9,9 +9,10 @@ import com.consulner.app.errors.GlobalExceptionHandler;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
+import com.sun.net.httpserver.HttpHandler;
 import io.vavr.control.Try;
 
-public abstract class Handler {
+public abstract class Handler implements HttpHandler {
 
     private final ObjectMapper objectMapper;
     private final ExceptionHandler exceptionHandler;

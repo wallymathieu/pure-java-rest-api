@@ -5,10 +5,12 @@ import com.consulner.app.errors.ExceptionHandler;
 import com.consulner.app.errors.GlobalExceptionHandler;
 import com.consulner.data.user.InMemoryUserRepository;
 import com.consulner.domain.user.UserRepository;
-import com.consulner.domain.user.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.util.List;
 
 public class Configuration {
 
@@ -23,21 +25,25 @@ public class Configuration {
         public <T> T readValue(InputStream pIs, Class<T> pType) throws IOException {
             return objectMapper.readValue(pIs, pType);
         }
+        @Override
+        public <T> T readValue(Reader r, Class<T> pType) throws IOException {
+            return objectMapper.readValue(r, pType);
+        }
 
+        @Override
+        public <T> List<T> readValues(Reader r, Class<T> pType) throws IOException {
+            return objectMapper.readValue(r, new TypeReference<List<T>>() {});
+        }
     };
     private final UserRepository USER_REPOSITORY = new InMemoryUserRepository();
-    private final UserService USER_SERVICE = new UserService(USER_REPOSITORY);
     private final ExceptionHandler GLOBAL_ERROR_HANDLER = new GlobalExceptionHandler(OBJECT_MAPPER);
 
     public ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
     }
 
-    public UserService getUserService() {
-        return USER_SERVICE;
-    }
 
-    UserRepository getUserRepository() {
+    public UserRepository getUserRepository() {
         return USER_REPOSITORY;
     }
 
