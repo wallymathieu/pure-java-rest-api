@@ -9,7 +9,7 @@ public class RegistrationRequest {
     private final String login;
     private final String password;
     @JsonCreator
-    public RegistrationRequest(@JsonProperty("login") String  login,@JsonProperty("password") String password) {
+    public RegistrationRequest(@JsonProperty("login") String login,@JsonProperty("password") String password) {
         this.login = login;
         this.password = password;
     }
